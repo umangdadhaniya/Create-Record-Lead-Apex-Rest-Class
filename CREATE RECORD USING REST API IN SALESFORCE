@@ -1,0 +1,34 @@
+@RestResource(urlMapping='/Lead/')
+global with sharing class MyRestResource {
+    @HttpPost
+    global static String creatRecord(){
+        string fname,lname,comp,fieldname,fieldvalue;
+        
+        RestRequest req = restcontext.request;
+        RestResponse res = restcontext.response;
+        
+        string jsonBody = req.requestBody.tostring();
+        
+        JSONparser parser = JSON.createParser(jsonBody);
+        
+        While (parser.nextToken()!=null){
+            if(parser.getCurrentToken() != JSONToken.END_OBJECT)
+            {
+                fieldname = parser.getCurrentName();
+                fieldvalue = parser.getText();
+                
+                if(fieldname == 'Firstname'){
+                    fname = fieldvalue;
+                }else if(fieldname == 'Lastname'){
+                    lname = fieldvalue;
+                }else if(fieldname == 'company'){
+                    comp = fieldvalue;
+                }
+                
+            }
+        }
+        lead l = new lead(firstName = fname,lastname = lname,company = comp);
+        insert l;
+        return l.id;
+    }
+}
